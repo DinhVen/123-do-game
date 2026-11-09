@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bảng điều khiển · 1, 2, 3 DÔ! (Control Panel &amp; Mock Simulator)</title>
+  <style>
+    :root {
+      --bg-dark: #19110d;
+      --bg-card: #241812;
+      --bg-input: #140d09;
+      --border-warm: #4c3323;
+      --accent-amber: #b36b22;
+      --accent-amber-hover: #cc7d2b;
+      --accent-gold: #f5b642;
+      --accent-green: #2f9e5b;
+      --accent-green-hover: #38b86b;
+      --accent-red: #d94336;
+      --accent-red-hover: #eb5244;
+      --text-main: #f4ebe1;
+      --text-muted: #a89482;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      margin: 0;
+      padding: 14px 16px 68px;
+    }
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-warm);
+      padding-bottom: 10px;
+    }
+    h1 {
+      color: var(--accent-gold);
+      margin: 0;
+      font-size: clamp(16px, 2.2vw, 22px);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .status-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      font-size: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: #2f2018;
+      border: 1px solid var(--border-warm);
+      color: #63c74d;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .badge.live {
+      background: rgba(217, 67, 54, 0.2);
+      border-color: var(--accent-red);
+      color: #ff8075;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+      gap: 14px;
+      align-items: start;
+      width: 100%;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-warm);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .section-title {
+      color: var(--accent-gold);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 0 0 12px;
+    }
+    .sub-title {
+      color: var(--accent-gold);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 16px 0 8px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border-warm);
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      margin: 8px 0 4px;
+      color: var(--text-muted);
+    }
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 6px;
+      border: 1px solid var(--border-warm);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent-gold);
+    }
+    .hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin: 8px 0;
+    }
+    .connect-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1.4fr) auto auto;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .btn-group-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-group-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-group-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    button {
+      padding: 9px 10px;
+      border: 1px solid var(--border-warm);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      background: #322117;
+      color: var(--text-main);
+      transition: background 0.15s, transform 0.05s;
+      min-width: 0;
+      word-break: break-word;
+    }
+    button:hover {
+      background: #422c1f;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    button.btn-green {
+      background: var(--accent-green);
+      border-color: #3ec273;
+      color: #ffffff;
+    }
+    button.btn-green:hover {
+      background: var(--accent-green-hover);
+    }
+    button.btn-amber {
+      background: var(--accent-amber);
+      border-color: #d68736;
+      color: #ffffff;
+      width: 100%;
+      font-weight: 700;
+      padding: 11px;
+      margin-top: 6px;
+    }
+    button.btn-amber:hover {
+      background: var(--accent-amber-hover);
+    }
+    button.btn-red {
+      background: var(--accent-red);
+      border-color: #f06459;
+      color: #ffffff;
+    }
+    button.btn-red:hover {
+      background: var(--accent-red-hover);
+    }
+    button.btn-full {
+      width: 100%;
+      margin-top: 8px;
+    }
+    .seat-list-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-warm);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      min-height: 110px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    pre {
+      background: var(--bg-input);
+      border: 1px solid var(--border-warm);
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-width: 100%;
+      max-height: 180px;
+      font-size: 11px;
+      line-height: 1.4;
+      margin: 0;
+      color: #dfd3c3;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #120b08;
+      border-top: 1px solid var(--border-warm);
+      padding: 8px 14px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      z-index: 50;
+    }
+    .footer-bar a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-bar a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <h1>Bảng điều khiển · 1, 2, 3 DÔ! — Quán Nhậu Vỉa Hè</h1>
+    <div class="status-bar">
+      <span>Chế độ: <strong id="modeBadge" class="badge">MOCK</strong></span>
+      <span>TikTok Live: <strong id="tiktokBadge" class="badge">IDLE (Chưa kết nối)</strong></span>
+      <span>Socket.io: <strong id="statusBadge" class="badge">Đang kết nối...</strong></span>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <!-- CỘT 1: KẾT NỐI TIKTOK LIVE & MỞ MÀN HÌNH OVERLAY 9:16 -->
+    <div class="card">
+      <div class="section-title">1 · KẾT NỐI TIKTOK LIVE</div>
+      <label for="tiktokUniqueId">Username kênh đang live</label>
+      <div class="connect-row">
+        <input id="tiktokUniqueId" type="text" placeholder="@tenkenhcuaban" autocomplete="off" />
+        <button class="btn-green" onclick="connectTikTokLive()">Kết nối</button>
+        <button onclick="disconnectTikTokLive()">Ngắt</button>
+      </div>
+      <div class="hint">
+        Kênh phải đang phát trực tiếp. Chỉ đọc sự kiện công khai (bình luận, quà, tim). Không cần mật khẩu hay cookie.
+      </div>
+      <div id="tiktokErrorBox" class="hint" style="color:#ff8075; display:none;"></div>
+
+      <button class="btn-amber" onclick="openOverlayWindow()">Mở màn hình overlay 9:16</button>
+      <div class="hint">
+        Trong <strong>TikTok LIVE Studio / OBS</strong>: Add source &rarr; <strong>Window capture</strong> (hoặc <strong>Browser Source</strong> <code>http://127.0.0.1:3000/overlay</code>) &rarr; chọn cửa sổ overlay. Bấm chuột 1 lần vào cửa sổ đó để bật âm thanh.
+      </div>
+
+      <div class="sub-title">TÙY CHỈNH CHỦ QUÁN &amp; BẢNG HIỆU (v2.0)</div>
+      <label for="hostTitleInput">Tên bảng hiệu quán</label>
+      <div class="connect-row">
+        <input id="hostTitleInput" type="text" value="QUÁN NHẬU GIÁ SV" />
+        <button class="btn-green" onclick="saveHostConfig()">Lưu</button>
+        <button onclick="resetHostAvatar()">Mặc định</button>
+      </div>
+      <label for="hostAvatarFile">Đổi hình Chủ Quán (Chọn ảnh PNG/JPG tách nền)</label>
+      <input id="hostAvatarFile" type="file" accept="image/*" onchange="uploadHostAvatarFile(event)" />
+
+      <div class="sub-title">SƠ ĐỒ 7 BÀN · 28 GHẾ &amp; HÀNG CHỜ</div>
+      <div id="tableSummary" class="seat-list-box">Chưa có ai ngồi bàn...</div>
+
+      <div class="sub-title">GIẢI PHÓNG NHANH GHẾ</div>
+      <div class="connect-row">
+        <input id="releaseSeatNum" type="number" min="1" max="28" value="1" placeholder="Số ghế (1..28)" />
+        <button onclick="releaseSeat(Number(document.getElementById('releaseSeatNum').value || 1))">Trống Ghế</button>
+        <button class="btn-red" onclick="resetEntireTable()">Xóa 28 Ghế</button>
+      </div>
+    </div>
+
+    <!-- CỘT 2: THỬ TƯƠNG TÁC, ĐỔ NGƯỜI MẪU & BOT MÔ PHỎNG -->
+    <div class="card">
+      <div class="section-title">2 · THỬ TƯƠNG TÁC QUÁN NHẬU 7 BÀN (v2.0)</div>
+
+      <div class="btn-group-2" style="margin-top:0;">
+        <div>
+          <label for="nickname">Tên người xem</label>
+          <input id="nickname" type="text" value="Anh Ba Sài Gòn" />
+        </div>
+        <div>
+          <label for="userId">TikTok userId</label>
+          <input id="userId" type="text" value="mock_viewer_01" />
+        </div>
+      </div>
+
+      <label for="customComment">Bình luận / Lệnh Chat (VAO, BIA, DZO, BAN 1..6, VIP)</label>
+      <input id="customComment" type="text" value="VAO" />
+
+      <button class="btn-full" onclick="sendCustomComment()">Gửi bình luận</button>
+
+      <div class="btn-group-3">
+        <button class="btn-green" onclick="sendComment('VAO')">🚶 CMT "VAO"</button>
+        <button onclick="sendComment('BIA')">🍺 CMT "BIA" (+1 ly)</button>
+        <button onclick="sendComment('DZO')">🍻 CMT "DZO" (Cả bàn)</button>
+      </div>
+
+      <div class="sub-title">ĐỔI BÀN (CHIBI ĐI BỘ SANG BÀN MỚI)</div>
+      <div class="btn-group-4">
+        <button onclick="sendComment('BAN 1')">Bàn 1</button>
+        <button onclick="sendComment('BAN 2')">Bàn 2</button>
+        <button onclick="sendComment('BAN 3')">Bàn 3</button>
+        <button onclick="sendComment('VIP')" style="border-color:#f5b642;color:#fde047;">👑 BÀN VIP</button>
+        <button onclick="sendComment('BAN 4')">Bàn 4</button>
+        <button onclick="sendComment('BAN 5')">Bàn 5</button>
+        <button onclick="sendComment('BAN 6')">Bàn 6</button>
+        <button onclick="quickGift('MOCK_GIFT_VIP_PASS')">🎁 Đủ 10xu VIP</button>
+      </div>
+
+      <div class="sub-title">ĐỔ KHÁCH MẪU &amp; VÒNG LẶP CẢ QUÁN</div>
+      <div class="btn-group-4">
+        <button onclick="seedSamplePlayers(4)">+4 Khách</button>
+        <button onclick="seedSamplePlayers(12)">+12 Khách</button>
+        <button onclick="seedSamplePlayers(28)">Đầy 28 Ghế</button>
+        <button onclick="sendCheers()">Hô DÔ (+5)</button>
+      </div>
+      <div class="btn-group-2">
+        <button onclick="sendLike(50)">Thả +50 Tim</button>
+        <button onclick="sendLike(100)">Thả +100 Tim (+1%)</button>
+      </div>
+      <button class="btn-red btn-full" onclick="resetEntireTable()">Làm trống toàn bộ 7 bàn (28 ghế) &amp; hàng chờ</button>
+
+      <div class="sub-title">BOT TƯƠNG TÁC MÔ PHỎNG (28 GHẾ)</div>
+      <div class="btn-group-3" style="align-items: end;">
+        <div>
+          <label for="botCount">Số bot</label>
+          <input id="botCount" type="number" min="1" max="45" value="18" />
+        </div>
+        <div>
+          <label for="botSpeed">Nhịp</label>
+          <select id="botSpeed">
+            <option value="2200">Chậm (2.2s)</option>
+            <option value="1200" selected>Vừa (1.2s)</option>
+            <option value="600">Nhanh (0.6s)</option>
+          </select>
+        </div>
+        <div>
+          <button id="botToggleBtn" class="btn-full" onclick="toggleSimBot()">Bật bot</button>
+        </div>
+      </div>
+      <div class="hint">
+        Bot tự động gõ <code>VAO</code>, <code>BIA</code>, <code>DZO</code>, đổi bàn <code>BAN 1..6</code> và gọi 7 món trên Thực Đơn.
+      </div>
+    </div>
+
+    <!-- CỘT 3: THỰC ĐƠN 7 MÓN, QUÀ TẶNG & NHẬT KÝ REAL-TIME -->
+    <div class="card">
+      <div class="section-title">3 · THỰC ĐƠN 7 MÓN &amp; QUÀ TẶNG (THẦN DIỆT MỒI)</div>
+
+      <div class="btn-group-3" style="margin-top:0;">
+        <button onclick="quickGift('MENU_LAC_RANG')">🥜 Lạc rang (1xu)</button>
+        <button onclick="quickGift('MENU_NEM_CHUA')">🥓 Nem chua (5xu)</button>
+        <button onclick="quickGift('MENU_MUC_NUONG')">🦑 Mực nướng (10xu)</button>
+        <button onclick="quickGift('MENU_CHAN_GA')">🍗 Chân gà (20xu)</button>
+        <button onclick="quickGift('MENU_CANH_GA')">🍖 Cánh gà (30xu)</button>
+        <button onclick="quickGift('MENU_BO_NUONG')">🥩 Bò nướng (99xu)</button>
+      </div>
+      <button class="btn-amber" onclick="quickGift('MENU_MOI_CA_QUAN')">🍲 MỜI CẢ QUÁN (&gt;100 xu · Mỗi bàn 1 Bò nướng)</button>
+
+      <div class="btn-group-2" style="margin-top:8px;">
+        <div>
+          <label for="mockGiftKey">Chọn Món / Quà TikTok</label>
+          <select id="mockGiftKey">
+            <option value="MENU_LAC_RANG">🥜 Lạc rang · 1 xu (-5% say)</option>
+            <option value="MENU_NEM_CHUA">🥓 Nem chua · 5 xu (-8% say)</option>
+            <option value="MENU_MUC_NUONG">🦑 Mực nướng · 10 xu (-12% say + Mở VIP)</option>
+            <option value="MENU_CHAN_GA">🍗 Chân gà sả tắc · 20 xu (-15% say)</option>
+            <option value="MENU_CANH_GA">🍖 Cánh gà chiên · 30 xu (-20% say)</option>
+            <option value="MENU_BO_NUONG">🥩 Bò nướng · 99 xu (-30% say)</option>
+            <option value="MENU_MOI_CA_QUAN">🍲 Mời cả quán · 199 xu (Cả 7 bàn)</option>
+            <option value="MOCK_GIFT_VIP">🍦 Ép Uống (+25% say)</option>
+            <option value="MOCK_GIFT_ALL">🍩 Bao Cả Quán Uống (+15% say)</option>
+            <option value="MOCK_GIFT_WIFE">🦢 Gọi Vợ Bắt Về (KO/Rời bàn)</option>
+          </select>
+        </div>
+        <div>
+          <label for="targetSeatIndex">Ghế mục tiêu (Tự động hoặc Ghế 1..28)</label>
+          <select id="targetSeatIndex">
+            <option value="auto" selected>🎯 Tự động theo bàn người tặng / Đô cao nhất</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-group-2">
+        <button class="btn-green" onclick="sendGift()">Gửi Gift vào Ghế chọn</button>
+        <button onclick="sendRandomWifeCheck()">Test Vợ Bắt Về Ngẫu Nhiên</button>
+      </div>
+
+      <div class="sub-title">THÔNG BÁO SỰ KIỆN GAMEPLAY (DÔ / GIFT / KO / VỢ BẮT)</div>
+      <pre id="fxLog">Chưa có sự kiện DÔ / KO...</pre>
+
+      <div class="sub-title">NHẬT KÝ SỰ KIỆN CHUẨN HÓA (mock:event_normalized)</div>
+      <pre id="eventLog"></pre>
+
+      <div class="sub-title">SNAPSHOT TRẠNG THÁI (game:state_snapshot)</div>
+      <pre id="stateView">Chưa có dữ liệu...</pre>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div>
+      Server: <strong>http://127.0.0.1:3000</strong> &middot;
+      Bảng điều khiển: <a href="/mock">http://127.0.0.1:3000/mock</a> &middot;
+      Overlay 9:16: <a href="/overlay" target="_blank">http://127.0.0.1:3000/overlay</a>
+    </div>
+    <div>
+      Master Plan v1.0 &middot; 6 Ghế + 30 Hàng chờ &middot; Nhấn phím <strong>M</strong> trên cửa sổ Overlay để Bật/Tắt tiếng
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const statusBadge = document.getElementById('statusBadge');
+    const modeBadge = document.getElementById('modeBadge');
+    const tiktokBadge = document.getElementById('tiktokBadge');
+    const tiktokErrorBox = document.getElementById('tiktokErrorBox');
+    const eventLog = document.getElementById('eventLog');
+    const stateView = document.getElementById('stateView');
+    const tableSummary = document.getElementById('tableSummary');
+    const fxLog = document.getElementById('fxLog');
+
+    let overlayPopup = null;
+    let botIntervalId = null;
+    let sampleCounter = 1;
+
+    const SAMPLE_NAMES = [
+      'Anh Tư Quận 4', 'Chú Bảy Cần Thơ', 'Minh An', 'Hải Quay Xe',
+      'Tùng Sơn Trà', 'Lâm Chợ Lớn', 'Hoàng Phú Nhuận', 'Kiệt Gò Vấp',
+      'Đạt Bình Thạnh', 'Long Tân Bình', 'Phúc Thủ Đức', 'Vinh Quận 7'
+    ];
+
+    const SAMPLE_CHATS = [
+      '1, 2, 3 Dô anh em ơi!',
+      'Làm ly nữa cho mát!',
+      'Tửu lượng bất bại nha!',
+      'Ai đô yếu coi chừng gục!',
+      'Nóc nhà chưa gọi đâu, chiến tiếp!',
+      'Chủ quán cho thêm dĩa mồi!'
+    ];
+
+    function openOverlayWindow() {
+      const availH = (window.screen && window.screen.availHeight) || 768;
+      const targetOuterH = Math.min(availH, 1040);
+      const estInnerH = Math.max(480, targetOuterH - 72);
+      const targetOuterW = Math.round((estInnerH * 9) / 16) + 16;
+      const overlayUrl = window.location.origin + '/overlay?v=' + Date.now();
+      if (overlayPopup && !overlayPopup.closed) {
+        overlayPopup.location.href = overlayUrl;
+        try {
+          overlayPopup.resizeTo(targetOuterW, targetOuterH);
+        } catch (_) {}
+        overlayPopup.focus();
+        return;
+      }
+      overlayPopup = window.open(
+        overlayUrl,
+        '123DoOverlay916',
+        `width=${targetOuterW},height=${targetOuterH},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes`
+      );
+    }
+
+    function updateTikTokUi(tiktok, mode) {
+      const effectiveMode = (mode || (tiktok && tiktok.mode) || 'MOCK').toUpperCase();
+      modeBadge.textContent = effectiveMode;
+      modeBadge.className = effectiveMode === 'LIVE' ? 'badge live' : 'badge';
+
+      if (effectiveMode === 'LIVE' && botIntervalId) {
+        stopSimBot();
+      }
+
+      if (!tiktok) return;
+      const st = tiktok.connectionState || 'IDLE';
+      const uid = tiktok.uniqueId ? '@' + tiktok.uniqueId : '';
+      tiktokBadge.textContent = uid ? `${st} (${uid})` : st;
+      tiktokBadge.className = st === 'CONNECTED' ? 'badge' : (st === 'ERROR' ? 'badge live' : 'badge');
+
+      const inputEl = document.getElementById('tiktokUniqueId');
+      if (tiktok.uniqueId && !inputEl.value) {
+        inputEl.value = '@' + tiktok.uniqueId;
+      }
+
+      if (tiktok.lastError) {
+        tiktokErrorBox.style.display = 'block';
+        tiktokErrorBox.textContent = '⚠️ ' + tiktok.lastError;
+      } else {
+        tiktokErrorBox.style.display = 'none';
+        tiktokErrorBox.textContent = '';
+      }
+    }
+
+    async function refreshControlStatus() {
+      try {
+        const res = await fetch('/api/control/status');
+        const data = await res.json();
+        if (data && data.ok) {
+          updateTikTokUi(data.tiktok, data.mode);
+          if (data.state) {
+            renderTableSummary(data.state);
+          }
+        }
+      } catch (_) {}
+    }
+
+    async function connectTikTokLive() {
+      const raw = document.getElementById('tiktokUniqueId').value.trim();
+      if (!raw) {
+        tiktokErrorBox.style.display = 'block';
+        tiktokErrorBox.textContent = '⚠️ Vui lòng nhập @username kênh TikTok đang phát trực tiếp.';
+        return;
+      }
+      tiktokBadge.textContent = 'CONNECTING...';
+      try {
+        const res = await fetch('/api/control/tiktok/connect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uniqueId: raw })
+        });
+        const data = await res.json();
+        updateTikTokUi(data.tiktok, data.state && data.state.mode);
+        if (!data.ok && data.error) {
+          tiktokErrorBox.style.display = 'block';
+          tiktokErrorBox.textContent = '⚠️ ' + data.error;
+        }
+      } catch (err) {
+        tiktokErrorBox.style.display = 'block';
+        tiktokErrorBox.textContent = '⚠️ Lỗi kết nối tới Server: ' + err.message;
+      }
+    }
+
+    async function disconnectTikTokLive() {
+      try {
+        const res = await fetch('/api/control/tiktok/disconnect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        updateTikTokUi(data.tiktok, 'MOCK');
+      } catch (_) {}
+    }
+
+    async function resetEntireTable() {
+      try {
+        await fetch('/api/control/reset-table', { method: 'POST' });
+      } catch (_) {}
+    }
+
+    (function initSeatDropdown() {
+      const sel = document.getElementById('targetSeatIndex');
+      if (!sel) return;
+      for (let s = 1; s <= 28; s++) {
+        const opt = document.createElement('option');
+        opt.value = String(s - 1);
+        const tIdx = Math.floor((s - 1) / 4);
+        const tblNames = ['Bàn 1', 'Bàn 2', 'Bàn 3', 'BÀN VIP', 'Bàn 4', 'Bàn 5', 'Bàn 6'];
+        opt.textContent = `Ghế #${s} (${tblNames[tIdx] || 'Bàn'})`;
+        sel.appendChild(opt);
+      }
+    })();
+
+    async function saveHostConfig(avatarUrlOverride) {
+      const title = document.getElementById('hostTitleInput').value.trim() || 'QUÁN NHẬU GIÁ SV';
+      const body = { title };
+      if (typeof avatarUrlOverride === 'string') {
+        body.avatarUrl = avatarUrlOverride;
+      }
+      try {
+        await fetch('/api/control/host-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      } catch (_) {}
+    }
+
+    function uploadHostAvatarFile(event) {
+      const file = event && event.target && event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const dataUrl = e && e.target ? String(e.target.result || '') : '';
+        if (dataUrl) {
+          saveHostConfig(dataUrl);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetHostAvatar() {
+      const fileInput = document.getElementById('hostAvatarFile');
+      if (fileInput) fileInput.value = '';
+      saveHostConfig('');
+    }
+
+    function renderTableSummary(state) {
+      if (!state || !Array.isArray(state.seats)) return;
+      updateTikTokUi(null, state.mode);
+      if (state.hostConfig && state.hostConfig.title) {
+        const tInput = document.getElementById('hostTitleInput');
+        if (tInput && document.activeElement !== tInput) {
+          tInput.value = state.hostConfig.title;
+        }
+      }
+      const seatedCount = state.seats.filter((s) => s && s.player).length;
+      const lines = [
+        `Phiên bản: v${state.stateVersion} | Đang ngồi: ${seatedCount}/${state.seats.length} ghế | Tim: ${state.likeMetrics ? state.likeMetrics.unconsumedLikes : 0}/100 | Hàng chờ: ${state.totalWaiting}/30`
+      ];
+
+      if (Array.isArray(state.tables) && state.tables.length > 0) {
+        for (const tbl of state.tables) {
+          const tblSeats = state.seats.filter((s) => tbl.seatIds.includes(s.seatId));
+          const occ = tblSeats
+            .filter((s) => s.player)
+            .map(
+              (s) =>
+                `#${s.seatId} ${s.player.isVIP ? '👑' : ''}${s.player.displayNickname} (${s.player.beerCount || 0}🍺, ${s.player.drunkLevel}%)`
+            );
+          lines.push(
+            `• ${tbl.label} (${tbl.occupiedCount}/${tbl.capacity}): ${occ.length > 0 ? occ.join(' | ') : '[Trống]'}`
+          );
+        }
+      } else {
+        for (const s of state.seats) {
+          if (!s.player) {
+            lines.push(`Ghế #${s.seatId}: [TRỐNG]`);
+          } else {
+            const vipTag = s.player.isVIP ? '★VIP ' : '';
+            lines.push(
+              `Ghế #${s.seatId}: ${vipTag}${s.player.displayNickname} | ${s.player.status} | Say: ${s.player.drunkLevel}/100`
+            );
+          }
+        }
+      }
+      tableSummary.textContent = lines.join('\n');
+    }
+
+    function appendLog(title, data) {
+      const line = `[${new Date().toLocaleTimeString()}] ${title}:\n${JSON.stringify(data, null, 2)}\n\n`;
+      eventLog.textContent = (line + eventLog.textContent).slice(0, 8000);
+    }
+
+    socket.on('connect', () => {
+      statusBadge.textContent = 'CONNECTED (' + socket.id + ')';
+      socket.emit('client:ready', { clientType: 'mock' });
+      refreshControlStatus();
+    });
+
+    socket.on('disconnect', () => {
+      statusBadge.textContent = 'DISCONNECTED';
+    });
+
+    socket.on('tiktok:status', (tiktokStatus) => {
+      updateTikTokUi(tiktokStatus, tiktokStatus && tiktokStatus.mode);
+    });
+
+    socket.on('game:state_snapshot', (payload) => {
+      stateView.textContent = JSON.stringify(payload, null, 2);
+      if (payload && payload.state) {
+        renderTableSummary(payload.state);
+      }
+    });
+
+    socket.on('game:action_fx', (fx) => {
+      const line = `[${new Date().toLocaleTimeString()}] [${fx.actionType}] ${JSON.stringify(fx)}\n`;
+      fxLog.textContent =
+        fxLog.textContent === 'Chưa có sự kiện DÔ / KO...'
+          ? line
+          : (line + fxLog.textContent).slice(0, 8000);
+    });
+
+    socket.on('mock:event_normalized', (evt) => {
+      appendLog('EVENT NORMALIZED', evt);
+    });
+
+    socket.on('mock:event_error', (err) => {
+      appendLog('EVENT ERROR', err);
+    });
+
+    function getUserInfo() {
+      return {
+        userId: document.getElementById('userId').value.trim() || 'mock_viewer_01',
+        nickname: document.getElementById('nickname').value.trim() || 'Khách Nhậu'
+      };
+    }
+
+    function sendComment(text) {
+      const user = getUserInfo();
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'COMMENT',
+          userId: user.userId,
+          nickname: user.nickname,
+          payload: { comment: text }
+        }
+      });
+    }
+
+    function sendCustomComment() {
+      const text = document.getElementById('customComment').value.trim() || 'VAO';
+      sendComment(text);
+    }
+
+    function sendVipJoin() {
+      const user = getUserInfo();
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'VIP_JOIN',
+          userId: user.userId,
+          nickname: user.nickname
+        }
+      });
+    }
+
+    function releaseSeat(seatId) {
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'MOCK_RELEASE_SEAT',
+          payload: { seatId }
+        }
+      });
+    }
+
+    function sendLike(likeDelta) {
+      const user = getUserInfo();
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'LIKE',
+          userId: user.userId,
+          nickname: user.nickname,
+          payload: { likeDelta }
+        }
+      });
+    }
+
+    function sendCheers() {
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'MOCK_CHEERS'
+        }
+      });
+    }
+
+    function resolveSelectedSeatIndex() {
+      const rawVal = document.getElementById('targetSeatIndex').value;
+      if (rawVal === 'auto' || rawVal === '' || rawVal === null) {
+        return null;
+      }
+      const parsed = Number(rawVal);
+      return Number.isInteger(parsed) ? parsed : null;
+    }
+
+    function sendGift() {
+      const user = getUserInfo();
+      const mockGiftKey = document.getElementById('mockGiftKey').value;
+      const targetSeatIndex = resolveSelectedSeatIndex();
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'GIFT',
+          userId: user.userId,
+          nickname: user.nickname,
+          payload: {
+            mockGiftKey,
+            repeatCount: 1,
+            ...(targetSeatIndex !== null ? { targetSeatIndex } : {})
+          }
+        }
+      });
+    }
+
+    function quickGift(mockGiftKey) {
+      const user = getUserInfo();
+      const targetSeatIndex = resolveSelectedSeatIndex();
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'GIFT',
+          userId: user.userId,
+          nickname: user.nickname,
+          payload: {
+            mockGiftKey,
+            repeatCount: 1,
+            ...(targetSeatIndex !== null ? { targetSeatIndex } : {})
+          }
+        }
+      });
+    }
+
+    function sendRandomWifeCheck() {
+      socket.emit('mock:trigger_event', {
+        rawEvent: {
+          eventType: 'MOCK_RANDOM_WIFE_CHECK'
+        }
+      });
+    }
+
+    function seedSamplePlayers(count) {
+      for (let i = 0; i < count; i += 1) {
+        const idx = sampleCounter++;
+        const name = SAMPLE_NAMES[idx % SAMPLE_NAMES.length] + ' #' + idx;
+        const uid = 'sample_user_' + idx;
+        socket.emit('mock:trigger_event', {
+          rawEvent: {
+            eventType: 'COMMENT',
+            userId: uid,
+            nickname: name,
+            payload: { comment: 'VAO' }
+          }
+        });
+      }
+    }
+
+    function stopSimBot() {
+      if (botIntervalId) {
+        clearInterval(botIntervalId);
+        botIntervalId = null;
+      }
+      const btn = document.getElementById('botToggleBtn');
+      btn.textContent = 'Bật bot';
+      btn.className = 'btn-full';
+    }
+
+    function toggleSimBot() {
+      if (botIntervalId) {
+        stopSimBot();
+        return;
+      }
+      const speedMs = Math.max(400, Number(document.getElementById('botSpeed').value) || 1200);
+      const maxBots = Math.max(1, Math.min(45, Number(document.getElementById('botCount').value) || 18));
+      const btn = document.getElementById('botToggleBtn');
+      btn.textContent = 'Đang chạy (Tắt bot)';
+      btn.className = 'btn-red btn-full';
+
+      const menuKeys = [
+        'MENU_LAC_RANG',
+        'MENU_NEM_CHUA',
+        'MENU_MUC_NUONG',
+        'MENU_CHAN_GA',
+        'MENU_CANH_GA',
+        'MENU_BO_NUONG'
+      ];
+      const switchCmds = ['BAN 1', 'BAN 2', 'BAN 3', 'BAN 4', 'BAN 5', 'BAN 6', 'VIP'];
+
+      botIntervalId = setInterval(() => {
+        const botIdx = (Math.floor(Math.random() * maxBots) % maxBots) + 1;
+        const uid = 'bot_nhau_' + botIdx;
+        const name = SAMPLE_NAMES[botIdx % SAMPLE_NAMES.length] + ' #' + botIdx;
+        const roll = Math.random();
+
+        if (roll < 0.34) {
+          socket.emit('mock:trigger_event', {
+            rawEvent: {
+              eventType: 'COMMENT',
+              userId: uid,
+              nickname: name,
+              payload: { comment: 'VAO' }
+            }
+          });
+        } else if (roll < 0.56) {
+          socket.emit('mock:trigger_event', {
+            rawEvent: {
+              eventType: 'COMMENT',
+              userId: uid,
+              nickname: name,
+              payload: { comment: Math.random() < 0.65 ? 'BIA' : 'DZO' }
+            }
+          });
+        } else if (roll < 0.72) {
+          const switchCmd = switchCmds[Math.floor(Math.random() * switchCmds.length)];
+          socket.emit('mock:trigger_event', {
+            rawEvent: {
+              eventType: 'COMMENT',
+              userId: uid,
+              nickname: name,
+              payload: { comment: switchCmd }
+            }
+          });
+        } else if (roll < 0.85) {
+          socket.emit('mock:trigger_event', {
+            rawEvent: {
+              eventType: 'LIKE',
+              userId: uid,
+              nickname: name,
+              payload: { likeDelta: 25 }
+            }
+          });
+        } else {
+          const gKey = menuKeys[Math.floor(Math.random() * menuKeys.length)];
+          socket.emit('mock:trigger_event', {
+            rawEvent: {
+              eventType: 'GIFT',
+              userId: uid,
+              nickname: name,
+              payload: { mockGiftKey: gKey, repeatCount: 1 }
+            }
+          });
+        }
+      }, speedMs);
+    }
+  </script>
+</body>
+</html>

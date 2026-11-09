@@ -1,0 +1,18 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies & Build Outputs
+node_modules/
+client/node_modules/
+client/dist/
+
+# Runtime Snapshot & Logs
+data/*.json
+data/*.tmp
+!data/.gitkeep
+*.log
+npm-debug.log*
+.playwright-cli/
+graphify-out/

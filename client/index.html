@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>1, 2, 3 DÔ! — Quán Nhậu Vỉa Hè (9:16)</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #0e0b16;
+        background-image: radial-gradient(circle at center, #1f1930 0%, #0e0b16 75%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      #game-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #game-container canvas {
+        display: block;
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+      }
+
+      /* Crisp Vector HTML Overlay Layer synchronized 100% full-viewport with Phaser 360x640 canvas */
+      #crisp-hud-root {
+        position: absolute;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        overflow: hidden;
+        font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        font-size: calc(100vw * 10 / 360);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        z-index: 10;
+      }
+
+      .hud-card {
+        position: absolute;
+        border-radius: 0.75em;
+        background: linear-gradient(180deg, rgba(29, 22, 48, 0.94) 0%, rgba(16, 13, 28, 0.97) 100%);
+        box-shadow: 0 0.35em 1em rgba(0, 0, 0, 0.65),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(4px);
+      }
+
+      .hud-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.75em;
+        border: 0.15em solid #fbbf24;
+        background: linear-gradient(90deg, rgba(48, 22, 56, 0.96) 0%, rgba(22, 26, 48, 0.96) 100%);
+        box-shadow: 0 0.3em 1.1em rgba(251, 191, 36, 0.18),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .hud-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.22em 0.65em;
+        border-radius: 0.45em;
+        background: linear-gradient(180deg, #ff4d58 0%, #c81e2b 100%);
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 0.84em;
+        letter-spacing: 0.03em;
+        box-shadow: 0 0.1em 0.5em rgba(244, 63, 94, 0.6);
+      }
+
+      .hud-title {
+        color: #fde047;
+        font-weight: 900;
+        font-size: 1.35em;
+        letter-spacing: 0.04em;
+        margin-left: 0.5em;
+        text-shadow: 0 0.12em 0 #7c2d12,
+                     0 0.22em 0.45em rgba(0, 0, 0, 0.95);
+      }
+
+      .hud-stats {
+        margin-left: auto;
+        color: #fff1f2;
+        font-weight: 800;
+        font-size: 0.9em;
+        background: linear-gradient(180deg, rgba(136, 19, 55, 0.75) 0%, rgba(76, 5, 25, 0.85) 100%);
+        padding: 0.22em 0.75em;
+        border-radius: 99px;
+        border: 1px solid rgba(251, 113, 133, 0.55);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .hud-banner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 0.65em;
+        border: 0.14em solid #f43f5e;
+        background: linear-gradient(90deg, rgba(68, 20, 58, 0.96) 0%, rgba(35, 20, 56, 0.96) 50%, rgba(68, 20, 58, 0.96) 100%);
+        color: #fef08a;
+        font-weight: 800;
+        font-size: 0.94em;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+      }
+
+      .hud-leaderboard {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 0.65em;
+        border: 1px solid rgba(251, 191, 36, 0.45);
+        background: linear-gradient(90deg, rgba(23, 27, 48, 0.94) 0%, rgba(34, 28, 56, 0.94) 50%, rgba(23, 27, 48, 0.94) 100%);
+        color: #fde68a;
+        font-weight: 700;
+        font-size: 0.9em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+      }
+
+      .hud-table-sign {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        padding: 0.15em 0.75em;
+        border-radius: 99px;
+        background: rgba(127, 29, 29, 0.88);
+        border: 1px solid rgba(254, 202, 202, 0.55);
+        color: #fef2f2;
+        font-weight: 900;
+        font-size: 0.82em;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+        box-shadow: 0 0.2em 0.5em rgba(0, 0, 0, 0.45);
+      }
+
+      .hud-seat-tag {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        white-space: nowrap;
+        font-weight: 800;
+        text-shadow: 0 0.15em 0.3em rgba(0, 0, 0, 0.98),
+                     0 0 0.2em rgba(0, 0, 0, 0.98);
+      }
+
+      .hud-seat-name {
+        padding: 0.1em 0.48em;
+        border-radius: 0.4em;
+        background: rgba(15, 23, 42, 0.86);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        font-size: 0.88em;
+        max-width: 11.2em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .hud-seat-status {
+        font-size: 0.82em;
+        letter-spacing: 0.02em;
+      }
+
+      .hud-seat-stool {
+        font-size: 0.76em;
+        letter-spacing: 0.03em;
+        padding: 0 0.3em;
+        border-radius: 0.3em;
+        background: rgba(9, 13, 22, 0.55);
+      }
+
+      .hud-guide-banner {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        padding: 0.25em 0.65em;
+        border: 0.14em solid rgba(251, 191, 36, 0.92);
+        background: linear-gradient(90deg, rgba(44, 24, 58, 0.96) 0%, rgba(22, 22, 48, 0.97) 50%, rgba(44, 24, 58, 0.96) 100%);
+        box-shadow: 0 0.25em 0.85em rgba(0, 0, 0, 0.65),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      }
+
+      .hud-queue-compact {
+        padding: 0.35em 0.6em;
+        border: 0.14em solid #38bdf8;
+        background: linear-gradient(180deg, rgba(15, 28, 52, 0.96) 0%, rgba(10, 17, 34, 0.98) 100%);
+        box-shadow: 0 0.35em 0.9em rgba(0, 0, 0, 0.75);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .hud-safe-footer {
+        position: absolute;
+        left: 2.2%;
+        bottom: 1.2%;
+        width: 95.6%;
+        text-align: center;
+        color: rgba(148, 163, 184, 0.52);
+        font-size: 0.74em;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      .hud-line {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.25;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <script>
+      (function () {
+        function autoFitPopup916() {
+          try {
+            var availH = (window.screen && window.screen.availHeight) || 768;
+            var targetOuterH = Math.min(availH, 1040);
+            if (
+              window.opener ||
+              window.outerWidth <= 680 ||
+              window.location.pathname.indexOf('overlay') !== -1
+            ) {
+              var chromeW = Math.max(0, (window.outerWidth || 500) - (window.innerWidth || 484));
+              var chromeH = Math.max(0, (window.outerHeight || 728) - (window.innerHeight || 656));
+              var usableInnerH = Math.max(480, targetOuterH - chromeH);
+              var idealInnerW = Math.round((usableInnerH * 9) / 16);
+              var idealOuterW = idealInnerW + chromeW;
+              window.resizeTo(idealOuterW, targetOuterH);
+            }
+          } catch (_) {}
+        }
+        window.addEventListener('load', function () {
+          autoFitPopup916();
+          setTimeout(autoFitPopup916, 150);
+          setTimeout(autoFitPopup916, 400);
+        });
+      })();
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
